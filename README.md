@@ -192,7 +192,7 @@ Research & production for sponsor-aware, revenue-optimized feed/ad ranking.
 
 ## Authors
 
-[Your Name], [Your Affiliation]
+[Prateek], [IIT Patna]
 ```
 
 ***
