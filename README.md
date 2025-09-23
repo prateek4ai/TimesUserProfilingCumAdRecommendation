@@ -92,9 +92,9 @@ If you use this pipeline, please cite as:
   url = {[https://github.com/prateek4ai/monetized-ctr-pipeline](https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation}
 }
 ```
-```
 
-***
+
+
 
 ## INSTALL.md
 
