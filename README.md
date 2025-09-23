@@ -116,6 +116,7 @@ Clone the repository:
 git clone https://github.com/yourusername/monetized-ctr-pipeline.git
 cd monetized-ctr-pipeline
 ```
+```
 
 Install Python dependencies:
 
