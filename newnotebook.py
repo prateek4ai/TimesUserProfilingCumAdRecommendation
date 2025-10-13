@@ -11,7 +11,7 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 
 
 
-# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
+# You can write up to 20GB to the current directory (/app/outputs/) that gets preserved as output when you create a version using "Save & Run All" 
 # You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
 
 # %% [code] {"execution":{"iopub.status.busy":"2025-09-17T08:39:51.093026Z","iopub.execute_input":"2025-09-17T08:39:51.093692Z","iopub.status.idle":"2025-09-17T08:39:54.585303Z","shell.execute_reply.started":"2025-09-17T08:39:51.093666Z","shell.execute_reply":"2025-09-17T08:39:54.584586Z"}}
@@ -209,10 +209,10 @@ def ingest_and_validate():
     print(f"Sponsored impression ratio: {(events_df.join(items_df, on='item_id')['is_sponsored']).mean():.3f}")
     
     # Save to disk (Kaggle-optimized paths)
-    events_df.write_parquet('/kaggle/working/raw_events.parquet')
-    items_df.write_parquet('/kaggle/working/raw_items.parquet')
+    events_df.write_parquet('/app/outputs/raw_events.parquet')
+    items_df.write_parquet('/app/outputs/raw_items.parquet')
     
-    print("\n💾 Raw data saved to /kaggle/working/")
+    print("\n💾 Raw data saved to /app/outputs/")
     print("   - raw_events.parquet")
     print("   - raw_items.parquet")
     
@@ -232,10 +232,10 @@ if __name__ == "__main__":
     
     # Quick peek at the data
     print("\n📋 Sample Events:")
-    print(events_df.head().to_pandas())
+    print(events_df.head())
     
     print("\n📋 Sample Items:")  
-    print(items_df.head().to_pandas())
+    print(items_df.head())
 
 
 # %% [code] {"execution":{"iopub.status.busy":"2025-09-17T08:39:54.587065Z","iopub.execute_input":"2025-09-17T08:39:54.587277Z","iopub.status.idle":"2025-09-17T08:40:00.454637Z","shell.execute_reply.started":"2025-09-17T08:39:54.587253Z","shell.execute_reply":"2025-09-17T08:40:00.453924Z"}}
@@ -256,8 +256,8 @@ print("🔧 Feature Engineering & Store Pipeline")
 print("=" * 60)
 
 # Load raw data
-events_df = pl.read_parquet('/kaggle/working/raw_events.parquet')
-items_df = pl.read_parquet('/kaggle/working/raw_items.parquet')
+events_df = pl.read_parquet('/app/outputs/raw_events.parquet')
+items_df = pl.read_parquet('/app/outputs/raw_items.parquet')
 
 # =============================================================================
 # 2.1 SESSIONIZATION & SEQUENCE FEATURES
@@ -385,7 +385,7 @@ def create_content_embeddings(items_df, embedding_dim=50):
         from sklearn.feature_extraction.text import TfidfVectorizer
         from sklearn.decomposition import TruncatedSVD
         
-        items_pd = items_df.to_pandas()
+        items_pd = items_df
         
         # Combine text features
         combined_text = (items_pd['title'] + " " + 
@@ -575,9 +575,9 @@ user_store, item_store = assemble_feature_store()
 training_data = prepare_training_data(events_df, user_store, item_store)
 
 # Save feature stores
-user_store.write_parquet('/kaggle/working/user_feature_store.parquet')
-item_store.write_parquet('/kaggle/working/item_feature_store.parquet')
-training_data.write_parquet('/kaggle/working/training_data.parquet')
+user_store.write_parquet('/app/outputs/user_feature_store.parquet')
+item_store.write_parquet('/app/outputs/item_feature_store.parquet')
+training_data.write_parquet('/app/outputs/training_data.parquet')
 
 print("\n💾 Feature stores saved:")
 print("   - user_feature_store.parquet")
@@ -595,7 +595,7 @@ print("3. Run Cell #5: RAG Pipeline for Cold Items")
 
 # Display sample of training data
 print("\n📋 Sample Training Data:")
-print(training_data.head().to_pandas())
+print(training_data.head())
 
 
 # %% [code] {"execution":{"iopub.status.busy":"2025-09-17T08:40:00.455508Z","iopub.execute_input":"2025-09-17T08:40:00.455845Z","iopub.status.idle":"2025-09-17T08:40:48.928390Z","shell.execute_reply.started":"2025-09-17T08:40:00.455825Z","shell.execute_reply":"2025-09-17T08:40:48.927496Z"}}
@@ -620,7 +620,7 @@ print("🚀 Baseline Wide & Deep Model Training")
 print("=" * 60)
 
 # Load preprocessed data
-training_data = pl.read_parquet('/kaggle/working/training_data.parquet')
+training_data = pl.read_parquet('/app/outputs/training_data.parquet')
 
 # =============================================================================
 # 3.1 DATA PREPROCESSING FOR PYTORCH (WITH STRATIFIED SPLIT)
@@ -642,7 +642,7 @@ class CTRDataProcessor:
                                  'item_avg_dwell', 'item_unique_users']
     
     def fit_transform(self, df):
-        df_pd = df.to_pandas()
+        df_pd = df
         
         # Handle categorical features
         categorical_encoded = {}
@@ -839,7 +839,7 @@ def train_model(model, train_loader, val_loader, epochs=10, lr=0.001):
         
         if val_metric > best_metric:
             best_metric = val_metric
-            torch.save(model.state_dict(), '/kaggle/working/best_wide_deep_model.pt')
+            torch.save(model.state_dict(), '/app/outputs/best_wide_deep_model.pt')
     
     return best_metric
 
@@ -894,7 +894,7 @@ best_metric = train_model(model, train_loader, val_loader, epochs=10, lr=0.001)
 
 print(f"\n✅ Training Complete!")
 print(f"📈 Best Validation Metric: {best_metric:.4f}")
-print(f"💾 Model saved to: /kaggle/working/best_wide_deep_model.pt")
+print(f"💾 Model saved to: /app/outputs/best_wide_deep_model.pt")
 
 print(f"\n🎯 Next Steps:")
 print("1. Run Cell #4: Advanced Transformer Model (DIN/DIEN)")
@@ -923,8 +923,8 @@ print("🧠 Advanced Transformer Model (DIN/DIEN) - Fixed")
 print("=" * 60)
 
 # Load feature stores with sequences
-user_store = pl.read_parquet('/kaggle/working/user_feature_store.parquet')
-training_data = pl.read_parquet('/kaggle/working/training_data.parquet')
+user_store = pl.read_parquet('/app/outputs/user_feature_store.parquet')
+training_data = pl.read_parquet('/app/outputs/training_data.parquet')
 
 # =============================================================================
 # 4.1 SEQUENCE DATASET WITH ATTENTION
@@ -932,8 +932,8 @@ training_data = pl.read_parquet('/kaggle/working/training_data.parquet')
 
 class SequenceCTRDataset(Dataset):
     def __init__(self, training_data, user_store, max_seq_len=50):
-        self.training_data = training_data.to_pandas()
-        self.user_store = user_store.to_pandas()
+        self.training_data = training_data
+        self.user_store = user_store
         self.max_seq_len = max_seq_len
         
         # Create user sequence lookup
@@ -1205,7 +1205,7 @@ def train_sequence_model(model, train_loader, val_loader, epochs=5):
         
         if val_auc > best_auc:
             best_auc = val_auc
-            torch.save(model.state_dict(), '/kaggle/working/best_din_model.pt')
+            torch.save(model.state_dict(), '/app/outputs/best_din_model.pt')
     
     return best_auc
 
@@ -1257,7 +1257,7 @@ try:
     
     print(f"\n✅ Sequence Model Training Complete!")
     print(f"📈 Best Validation AUC: {best_auc:.4f}")
-    print(f"💾 Model saved to: /kaggle/working/best_din_model.pt")
+    print(f"💾 Model saved to: /app/outputs/best_din_model.pt")
     
     print(f"\n🎯 Performance Comparison:")
     print(f"  - Wide & Deep Baseline: 87.46% AUC")
@@ -1297,9 +1297,9 @@ print("🔍 RAG Pipeline for Cold Items")
 print("=" * 60)
 
 # Load data
-items_df = pl.read_parquet('/kaggle/working/raw_items.parquet')
-events_df = pl.read_parquet('/kaggle/working/raw_events.parquet')
-item_store = pl.read_parquet('/kaggle/working/item_feature_store.parquet')
+items_df = pl.read_parquet('/app/outputs/raw_items.parquet')
+events_df = pl.read_parquet('/app/outputs/raw_events.parquet')
+item_store = pl.read_parquet('/app/outputs/item_feature_store.parquet')
 
 # =============================================================================
 # 5.1 CONTENT-BASED SIMILARITY ENGINE
@@ -1307,7 +1307,7 @@ item_store = pl.read_parquet('/kaggle/working/item_feature_store.parquet')
 
 class ContentSimilarityEngine:
     def __init__(self, items_df, n_components=100):
-        self.items_df = items_df.to_pandas()
+        self.items_df = items_df
         self.n_components = n_components
         self.tfidf_vectorizer = TfidfVectorizer(
             max_features=5000, 
@@ -1373,8 +1373,8 @@ class ContentSimilarityEngine:
 
 class BayesianCTREstimator:
     def __init__(self, events_df, items_df, alpha=1.0, beta=1.0):
-        self.events_df = events_df.to_pandas()
-        self.items_df = items_df.to_pandas()
+        self.events_df = events_df
+        self.items_df = items_df
         self.alpha = alpha  # Beta prior parameter
         self.beta = beta   # Beta prior parameter
         self.item_stats = {}
@@ -1442,7 +1442,7 @@ class SimpleAttributeGenerator:
     """Simplified attribute generation without external LLM APIs"""
     
     def __init__(self, items_df):
-        self.items_df = items_df.to_pandas()
+        self.items_df = items_df
         self.category_patterns = self._build_category_patterns()
     
     def _build_category_patterns(self):
@@ -1589,7 +1589,7 @@ predictions_df = pl.DataFrame([
     for pred in cold_item_predictions
 ])
 
-predictions_df.write_parquet('/kaggle/working/cold_item_predictions.parquet')
+predictions_df.write_parquet('/app/outputs/cold_item_predictions.parquet')
 
 print(f"\n💾 Saved {len(cold_item_predictions)} cold item predictions")
 print(f"📊 Average estimated CTR: {predictions_df['estimated_ctr'].mean():.4f}")
@@ -1639,9 +1639,9 @@ print("🎯 Agentic Re-ranker - Multi-Objective Optimization")
 print("=" * 60)
 
 # Load existing models and predictions
-training_data = pl.read_parquet('/kaggle/working/training_data.parquet')
-cold_predictions = pl.read_parquet('/kaggle/working/cold_item_predictions.parquet')
-item_store = pl.read_parquet('/kaggle/working/item_feature_store.parquet')
+training_data = pl.read_parquet('/app/outputs/training_data.parquet')
+cold_predictions = pl.read_parquet('/app/outputs/cold_item_predictions.parquet')
+item_store = pl.read_parquet('/app/outputs/item_feature_store.parquet')
 
 # =============================================================================
 # 6.1 CONSTRAINT AND OBJECTIVE DEFINITIONS
@@ -1996,8 +1996,8 @@ class IntegratedRecommendationEngine:
             revenue_weight=0.35, 
             diversity_weight=0.25
         )
-        self.item_data = item_store.to_pandas()
-        self.cold_predictions = cold_predictions.to_pandas()
+        self.item_data = item_store
+        self.cold_predictions = cold_predictions
         
     def get_candidate_items(self, user_context: Dict, num_candidates: int = 50) -> List[Dict]:
         """Generate candidate items from different sources"""
@@ -2153,7 +2153,7 @@ if all_recommendations:
             })
     
     results_df = pl.DataFrame(results_data)
-    results_df.write_parquet('/kaggle/working/final_recommendations.parquet')
+    results_df.write_parquet('/app/outputs/final_recommendations.parquet')
     
     print(f"💾 Saved {len(results_data)} final recommendations")
 
@@ -2206,8 +2206,8 @@ print("📋 End-to-End System Evaluation & Deployment Framework - FIXED")
 print("=" * 70)
 
 # Load final results
-final_recommendations = pl.read_parquet('/kaggle/working/final_recommendations.parquet')
-cold_predictions = pl.read_parquet('/kaggle/working/cold_item_predictions.parquet')
+final_recommendations = pl.read_parquet('/app/outputs/final_recommendations.parquet')
+cold_predictions = pl.read_parquet('/app/outputs/cold_item_predictions.parquet')
 
 # =============================================================================
 # 7.1 JSON SERIALIZATION HELPER FUNCTIONS
@@ -2247,7 +2247,7 @@ class RecommendationSystemEvaluator:
         """Comprehensive system performance evaluation"""
         
         # Convert to pandas for easier analysis
-        df = recommendations_df.to_pandas()
+        df = recommendations_df
         
         # === CTR PERFORMANCE ===
         ctr_metrics = {
@@ -2647,16 +2647,16 @@ print(f"  Monitoring: ✅ Configured")
 
 # Save comprehensive evaluation report - FIXED VERSION
 try:
-    with open('/kaggle/working/final_evaluation_report.json', 'w') as f:
+    with open('/app/outputs/final_evaluation_report.json', 'w') as f:
         json.dump(evaluation_report_safe, f, indent=2)
     print(f"\n💾 ✅ Successfully saved comprehensive evaluation report")
-    print(f"📁 Report location: /kaggle/working/final_evaluation_report.json")
+    print(f"📁 Report location: /app/outputs/final_evaluation_report.json")
 except Exception as e:
     print(f"\n⚠️  Error saving JSON report: {e}")
     # Save as text fallback
-    with open('/kaggle/working/final_evaluation_report.txt', 'w') as f:
+    with open('/app/outputs/final_evaluation_report.txt', 'w') as f:
         f.write(str(evaluation_report_safe))
-    print(f"💾 ✅ Saved report as text file: /kaggle/working/final_evaluation_report.txt")
+    print(f"💾 ✅ Saved report as text file: /app/outputs/final_evaluation_report.txt")
 
 print(f"\n🎊 MONETIZED RECOMMENDATION SYSTEM - DEPLOYMENT COMPLETE!")
 print("=" * 70)
@@ -3123,9 +3123,9 @@ tenrec_benchmark_report = {
 # Save results
 try:
     import json
-    with open('/kaggle/working/tenrec_benchmark_results.json', 'w') as f:
+    with open('/app/outputs/tenrec_benchmark_results.json', 'w') as f:
         json.dump(tenrec_benchmark_report, f, indent=2, default=str)
-    print(f"\n💾 ✅ Saved Tenrec benchmark results to: /kaggle/working/tenrec_benchmark_results.json")
+    print(f"\n💾 ✅ Saved Tenrec benchmark results to: /app/outputs/tenrec_benchmark_results.json")
 except:
     print(f"\n💾 ⚠️  Could not save JSON results (file system limitations)")
 
@@ -3146,7 +3146,7 @@ print(f"\n🚀 System ready for production deployment with public dataset valida
 # CELL: Retail Rocket Benchmark - COMPLETE FIXED VERSION
 # Download, process, and test our monetized recommendation system
 # ===========================================================
-!pip -q install polars==0.20.5 kaggle==1.6.12 tqdm rich scikit-learn
+#!pip -q install polars==0.20.5 kaggle==1.6.12 tqdm rich scikit-learn
 
 import os, json, zipfile, numpy as np, subprocess, pathlib, warnings
 import pandas as pd  # backup for batching
@@ -3156,7 +3156,7 @@ from tqdm.auto import tqdm
 
 # 1 — Download via Kaggle API
 dataset_slug = "retailrocket/ecommerce-dataset"
-root = pathlib.Path("/kaggle/working/retailrocket")
+root = pathlib.Path("/app/outputs/retailrocket")
 root.mkdir(exist_ok=True)
 
 if not (root/"events.csv").exists():
@@ -3222,7 +3222,7 @@ print(f"✅ Preprocessed splits - Train: {len(splits['train']):,}, Val: {len(spl
 # 5 — Baseline Model Training (Logistic Regression)
 print("🔄 Training baseline model...")
 train_sample = splits["train"].sample(n=min(100_000, len(splits["train"])), seed=42)
-train_data = train_sample.to_pandas()  # Convert for sklearn
+train_data = train_sample  # Convert for sklearn
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
@@ -3303,7 +3303,7 @@ retail_rocket_report = {
 }
 
 # Save report
-report_path = "/kaggle/working/retailrocket_benchmark.json"
+report_path = "/app/outputs/retailrocket_benchmark.json"
 with open(report_path, 'w') as f:
     json.dump(retail_rocket_report, f, indent=2)
 

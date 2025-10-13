@@ -1,0 +1,70 @@
+[project]
+name = "times-ctr-optimizer"
+version = "1.0.1"
+description = "Professional CTR optimization achieving 20.4% performance - Production-ready recommendation system by MTech AI student at IIT Patna"
+authors = [
+    {name = "Prateek", email = "prat.cann.170701@gmail.com"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Office/Business :: Financial",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ["ctr-optimization", "recommendation-system", "machine-learning", "ad-tech", "sponsored-content", "revenue-optimization", "click-through-rate", "iit-patna", "times-network"]
+dependencies = [
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
+    "polars>=0.19.0",
+    "scikit-learn>=1.0.0",
+    "torch>=1.12.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.11.0",
+    "tqdm>=4.60.0",
+    "rich>=12.0.0",
+    "pyarrow>=10.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+]
+benchmarks = [
+    "plotly>=5.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation"
+Repository = "https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation"
+Documentation = "https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation#readme"
+Issues = "https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation/issues"
+PyPI = "https://pypi.org/project/times-ctr-optimizer/"
+
+[project.scripts]
+times-ctr = "times_ctr_optimizer.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+times_ctr_optimizer = ["*.json", "*.yaml"]

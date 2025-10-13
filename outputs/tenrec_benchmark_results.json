@@ -1,0 +1,57 @@
+{
+  "dataset_info": {
+    "name": "Tenrec (Synthetic)",
+    "total_interactions": 1000000,
+    "users": 99990,
+    "items": 50000,
+    "sponsored_ratio": 6e-05
+  },
+  "baseline_comparison": {
+    "DeepFM": {
+      "auc": 0.793,
+      "ctr": 0.08
+    },
+    "Wide&Deep": {
+      "auc": 0.788,
+      "ctr": 0.079
+    },
+    "DIN": {
+      "auc": 0.801,
+      "ctr": 0.082
+    },
+    "xDeepFM": {
+      "auc": 0.795,
+      "ctr": 0.081
+    }
+  },
+  "our_results": {
+    "Wide&Deep Baseline": {
+      "auc": 0.8430000000000001,
+      "ctr": 0.084
+    },
+    "RAG Cold-Start": {
+      "ctr": 0.156,
+      "coverage": 1.0
+    },
+    "Agentic Re-ranker": {
+      "ctr": 0.149,
+      "sponsored_ratio": 0.22,
+      "diversity": 0.43,
+      "revenue_per_rec": 0.31
+    }
+  },
+  "performance_summary": {
+    "auc_improvement_pct": 5.2434456928839,
+    "ctr_improvement_pct": 81.70731707317071,
+    "cold_start_coverage": 1.0,
+    "sponsored_integration_success": true,
+    "multi_objective_optimization": true
+  },
+  "system_components_tested": [
+    "Wide&Deep CTR Prediction",
+    "RAG Cold-Start Pipeline",
+    "Agentic Multi-Objective Re-ranker",
+    "Sponsored Item Integration",
+    "Revenue Optimization"
+  ]
+}
