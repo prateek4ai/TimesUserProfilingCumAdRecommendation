@@ -447,6 +447,284 @@ mypy src/
 
 -----
 
+## 📦 PyPI Package Usage
+
+### Installation
+
+The `times-ctr-optimizer` package is available on PyPI and can be installed with a single command:
+
+Install from PyPI (after publishing)
+pip install times-ctr-optimizer
+
+Or install from source
+pip install git+https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation.git
+
+For development
+git clone https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation.git
+cd TimesUserProfilingCumAdRecommendation
+pip install -e .
+
+text
+
+### Quick Start
+
+#### 1. Basic CTR Prediction
+
+from times_ctr_optimizer import CTRPredictor
+
+Initialize predictor with trained model
+predictor = CTRPredictor(model_path="outputs/best_wide_deep_model.pt")
+
+Predict CTR for a single user-item pair
+ctr = predictor.predict(
+user_id=12345,
+item_id=67890,
+position=1,
+hour=14
+)
+
+print(f"Predicted CTR: {ctr:.2%}")
+
+Output: Predicted CTR: 15.34%
+text
+
+#### 2. Batch Predictions
+
+Predict for multiple user-item pairs efficiently
+pairs = [
+{"user_id": 1, "item_id": 100, "position": 1},
+{"user_id": 2, "item_id": 200, "position": 2},
+{"user_id": 3, "item_id": 300, "position": 3}
+]
+
+ctrs = predictor.predict_batch(pairs)
+
+for pair, ctr in zip(pairs, ctrs):
+print(f"User {pair['user_id']} + Item {pair['item_id']}: {ctr:.2%}")
+
+text
+
+#### 3. Using the API Server
+
+from times_ctr_optimizer.api import create_app
+import uvicorn
+
+Create FastAPI application
+app = create_app(model_path="outputs/best_wide_deep_model.pt")
+
+Run server
+uvicorn.run(app, host="0.0.0.0", port=8000)
+
+text
+
+Then test the API:
+
+Health check
+curl http://localhost:8000/health
+
+Predict CTR
+curl -X POST http://localhost:8000/predict
+-H "Content-Type: application/json"
+-d '{
+"user_id": 12345,
+"item_id": 67890,
+"position": 1,
+"hour": 14
+}'
+
+text
+
+#### 4. Command-Line Interface
+
+The package includes a CLI tool for quick predictions:
+
+After installation, use the times-ctr command
+times-ctr --user-id 123 --item-id 456 --model outputs/best_wide_deep_model.pt
+
+Output:
+Predicted CTR: 18.45%
+text
+
+#### 5. Feature Engineering
+
+from times_ctr_optimizer.utils import FeatureEngineer
+
+Initialize feature engineer
+engineer = FeatureEngineer()
+
+Extract features for prediction
+features = engineer.extract_features(
+user_id=12345,
+item_id=67890,
+hour=14,
+day_of_week=2,
+position=1,
+is_sponsored=True
+)
+
+print(f"Feature vector shape: {features.shape}")
+
+Output: Feature vector shape: (32,)
+text
+
+#### 6. Loading Data
+
+from times_ctr_optimizer.utils import DataLoader
+
+Initialize data loader
+loader = DataLoader(data_dir="outputs")
+
+Load datasets
+training_data = loader.load_training_data()
+user_features = loader.load_user_features()
+item_features = loader.load_item_features()
+
+Or load all at once
+datasets = loader.load_all()
+
+print(f"Training samples: {len(training_data):,}")
+print(f"Users: {len(user_features):,}")
+print(f"Items: {len(item_features):,}")
+
+text
+
+#### 7. Evaluation Metrics
+
+from times_ctr_optimizer.utils.metrics import (
+calculate_auc,
+calculate_ctr,
+calculate_precision_at_k,
+calculate_ndcg_at_k
+)
+import numpy as np
+
+### Example predictions and ground truth
+y_true = np.array()​
+y_pred = np.array([0.1, 0.8, 0.7, 0.2, 0.9])
+
+### Calculate metrics
+auc = calculate_auc(y_true, y_pred)
+precision = calculate_precision_at_k(y_true, y_pred, k=3)
+ndcg = calculate_ndcg_at_k(y_true, y_pred, k=3)
+
+print(f"AUC: {auc:.4f}")
+print(f"Precision@3: {precision:.4f}")
+print(f"NDCG@3: {ndcg:.4f}")
+
+
+### Advanced Usage
+
+#### Custom Model Training
+
+from times_ctr_optimizer.models import WideDeepModel
+import torch
+
+Define model architecture
+categorical_dims = {
+'category_l1': 10,
+'device_type': 3,
+'hour': 24,
+'day_of_week': 7,
+'month': 12,
+'is_sponsored': 2,
+'exposure_bucket': 10
+}
+
+model = WideDeepModel(
+categorical_dims=categorical_dims,
+num_numerical=25,
+embedding_dim=8,
+deep_layers=
+)
+
+Training loop (simplified)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+criterion = torch.nn.BCELoss()
+
+Train your model...
+text
+
+#### Production Deployment
+
+Full production setup with monitoring
+from times_ctr_optimizer import CTRPredictor
+from times_ctr_optimizer.api import create_app
+import logging
+
+Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(name)
+
+Initialize predictor
+predictor = CTRPredictor(model_path="models/production_model.pt")
+
+Create API with custom settings
+app = create_app(model_path="models/production_model.pt")
+
+Add middleware, monitoring, etc.
+Then deploy with:
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+text
+
+### Package Structure
+
+times-ctr-optimizer/
+├── CTRPredictor # Main prediction class
+├── WideDeepModel # Model architecture
+├── api/
+│ └── create_app() # FastAPI server factory
+├── utils/
+│ ├── FeatureEngineer # Feature extraction
+│ ├── DataLoader # Data loading utilities
+│ └── metrics # Evaluation metrics
+└── cli # Command-line tool
+
+text
+
+### Requirements
+
+- Python 3.11+
+- PyTorch 2.1.0+
+- FastAPI 0.104.0+ (for API server)
+- Polars 0.19.0+ (for data processing)
+- NumPy 1.24.0+
+- Scikit-learn 1.3.0+
+
+### Publishing to PyPI
+
+If you want to publish your own version:
+
+#### Install build tools
+pip install build twine
+
+#### Build the package
+python -m build
+
+#### Test on TestPyPI first
+python -m twine upload --repository testpypi dist/*
+
+#### Then publish to PyPI
+python -m twine upload dist/*
+
+
+### Links
+
+- **PyPI Package**: Coming soon to https://pypi.org/project/times-ctr-optimizer/
+- **GitHub Repository**: https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation
+- **Documentation**: See [docs/](docs/) folder
+- **Issues**: https://github.com/prateek4ai/TimesUserProfilingCumAdRecommendation/issues
+
+### Support
+
+For questions, issues, or contributions:
+- Open an issue on GitHub
+- Email: prat.cann.170701@gmail.com
+- Check the [API documentation](docs/API.md)
+
+---
+
+**Note**: The package is production-ready and achieves **87.46% validation AUC** on the Times Network dataset.
+
 ## 📈 Roadmap
 
   - [ ] Add authentication (JWT tokens)
@@ -491,7 +769,7 @@ MIT License - See [LICENSE](https://www.google.com/search?q=LICENSE) file
 
   - **Email**: prat.cann.170701@gmail.com
   - **GitHub**: [@prateek4ai](https://www.google.com/search?q=https://github.com/prateek4ai)
-  - **LinkedIn**: [Prateek Kumar](https://www.google.com/search?q=https://linkedin.com/in/prateek-kumar)
+  - **LinkedIn**: [Prateek](https://www.linkedin.com/in/prateek-b102491b6/)
 
 -----
 
