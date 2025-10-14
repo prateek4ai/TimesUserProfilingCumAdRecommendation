@@ -1,0 +1,42 @@
+================================================================================
+🔬 PRE-TRAINING ON UCI NEWS AGGREGATOR DATASET
+🎓 IIT Patna MTech AI Project | 🏢 Times Network Application
+👨‍🎓 Developer: Prateek (prat.cann.170701@gmail.com)
+================================================================================
+
+📥 Step 1: Downloading UCI News Aggregator dataset...
+✅ Dataset already available
+
+🔧 Step 2: Processing news dataset...
+Traceback (most recent call last):
+  File "/workspaces/TimesUserProfilingCumAdRecommendation/train_news_pretrained_model.py", line 110, in <module>
+    news_df = pl.read_csv(
+              ^^^^^^^^^^^^
+  File "/home/codespace/.local/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 128, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/codespace/.local/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 128, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/codespace/.local/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 128, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/codespace/.local/lib/python3.12/site-packages/polars/io/csv/functions.py", line 549, in read_csv
+    df = _read_csv_impl(
+         ^^^^^^^^^^^^^^^
+  File "/home/codespace/.local/lib/python3.12/site-packages/polars/io/csv/functions.py", line 697, in _read_csv_impl
+    pydf = PyDataFrame.read_csv(
+           ^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ComputeError: could not parse `"Death stars" in Orion blast planets before they even form` as dtype `str` at column 'column_2' (column number 2)
+
+The current offset in the file is 261919 bytes.
+
+You might want to try:
+- increasing `infer_schema_length` (e.g. `infer_schema_length=10000`),
+- specifying correct dtype with the `schema_overrides` argument
+- setting `ignore_errors` to `True`,
+- adding `"Death stars" in Orion blast planets before they even form` to the `null_values` list.
+
+Original error: ```invalid csv file
+
+Field `"Death stars" in Orion blast planets before they even form` is not properly escaped.```

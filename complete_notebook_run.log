@@ -1,0 +1,4 @@
+  File "/workspaces/TimesUserProfilingCumAdRecommendation/newnotebook.py", line 956
+    for _, row in self.user_store.iter_rows(named=True)):
+                                                       ^
+SyntaxError: unmatched ')'

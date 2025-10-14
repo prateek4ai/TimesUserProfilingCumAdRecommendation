@@ -1,0 +1,4 @@
+  File "/workspaces/TimesUserProfilingCumAdRecommendation/news_training_standalone.py", line 98
+    categories_l2 = {
+                    ^
+SyntaxError: '{' was never closed

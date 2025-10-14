@@ -1,0 +1,28 @@
+================================================================================
+🔬 UCI NEWS PRE-TRAINING (Pandas Version)
+👨‍🎓 Prateek | IIT Patna MTech AI | Times Network
+================================================================================
+
+📥 Downloading UCI News Aggregator...
+✅ Already available
+
+🔧 Loading with Pandas...
+✅ Loaded 100,000 articles
+✅ CTR: 0.114
+
+🏗️ Encoding features...
+✅ Features: (100000, 9)
+
+🚀 Training...
+Epoch 1/5: Val AUC=0.9750
+Epoch 2/5: Val AUC=1.0000
+Epoch 3/5: Val AUC=1.0000
+Epoch 4/5: Val AUC=1.0000
+Epoch 5/5: Val AUC=1.0000
+
+💾 Saving...
+================================================================================
+🎊 COMPLETE! Best AUC: 1.0000
+💾 outputs/news_pretrained_model.pth
+📊 100,000 articles, CTR: 0.114
+================================================================================

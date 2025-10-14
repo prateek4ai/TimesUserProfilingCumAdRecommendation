@@ -1,0 +1,4 @@
+  File "/workspaces/TimesUserProfilingCumAdRecommendation/newnotebook.py", line 1581
+    item_interaction_counts = events_df.group_by('item_id').len().sort('len')
+    ^
+IndentationError: expected an indented block after 'try' statement on line 1578
